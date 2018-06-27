@@ -5,8 +5,8 @@ import (
 	"net/url"
 	"time"
 
-	xhttp "git.biezao.com/ant/xmiss/foundation/http"
 	"git.biezao.com/ant/xmiss/foundation/profile"
+	xhttp "github.com/friendlyhank/foundation/http"
 )
 
 //CmqClient -

@@ -1,6 +1,6 @@
 package cmqapi
 
-import "git.biezao.com/ant/xmiss/foundation/util/str"
+import "github.com/friendlyhank/foundation/str"
 
 var (
 	defAccount = &Account{

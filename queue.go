@@ -1,7 +1,7 @@
 package cmqapi
 
 import (
-	"git.biezao.com/ant/xmiss/foundation/util/str"
+	"github.com/friendlyhank/foundation/str"
 )
 
 //CmqQueue -队列

@@ -7,18 +7,21 @@ import (
 
 	"git.biezao.com/ant/xmiss/foundation/profile"
 	xhttp "github.com/friendlyhank/foundation/http"
+	"github.com/friendlyhank/foundation/str"
 )
 
 //CmqClient -
 type CmqClient struct {
+	IsInner   bool   //是否内网
 	Host      string //当前的Host
 	Region    string //地区
-	IsInner   bool   //是否内网
 	InnerAddr string //内网地址
 	OutAddr   string //外网地址
 	Version   string //版本号
 	HTTP      string
 	Method    string
+	secretID  string
+	secretKey string
 }
 
 //result -
@@ -170,27 +173,25 @@ type DeleteSubscribeRes struct {
 	result
 }
 
-//NewClient -
-func (c *CmqClient) NewClient(region, version, http, method string, IsInner bool) (cmqclient *CmqClient) {
+//NewCmqClient -
+func NewCmqClient(secretID, secretKey, region string, IsInner bool) (cmqclient *CmqClient) {
 	cmqclient = &CmqClient{
-		Region:  region,
-		Version: version,
-		HTTP:    http,
-		Method:  method,
-		IsInner: IsInner,
+		secretID:  secretID,
+		secretKey: secretKey,
+		Region:    region,
+		Version:   "SDKGO1.0",
+		HTTP:      "",
+		Method:    "GET",
+		IsInner:   IsInner,
 	}
 	cmqclient.InnerAddr = "http://cmq-queue-" + region + ".api.tencentyun.com/v2/index.php"
 	cmqclient.OutAddr = "https://cmq-queue-" + region + ".api.qcloud.com/v2/index.php"
-	if IsInner {
-		cmqclient.Host = cmqclient.InnerAddr
-	} else {
-		cmqclient.Host = cmqclient.OutAddr
-	}
+	cmqclient.Host = cmqclient.getHost(IsInner)
 	return cmqclient
 }
 
-func (c *CmqClient)getHost(isInner bool)string{
-	return str.CaseString(isInner,c.InnerAddr,c.OutAddr)
+func (c *CmqClient) getHost(isInner bool) string {
+	return str.CaseString(isInner, c.InnerAddr, c.OutAddr)
 }
 
 //BuildReqInter -初始化参数

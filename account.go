@@ -1,6 +1,11 @@
 package cmqapi
 
-import "github.com/friendlyhank/foundation/str"
+import (
+	"sync"
+
+	"git.biezao.com/ant/xmiss/foundation/vars"
+	"github.com/friendlyhank/foundation/str"
+)
 
 var (
 	defAccount = &Account{
@@ -8,6 +13,11 @@ var (
 		SecretID:  "AKIDnibJrEbqTwKXZWN3c1IDFIB80hIohKK9",
 		SecretKey: "0Rn7PYYP5au43qW0MYZO2OdkiV7cxFMI",
 	}
+)
+
+var (
+	once           sync.Once
+	defaultAccount *Account
 )
 
 //Account -
@@ -19,9 +29,24 @@ type Account struct {
 }
 
 //NewAccount -
-func (a *Account) NewAccount(region string, isinner bool) *Account {
-	defAccount.CmqClient = new(CmqClient).NewClient(region, "SDKGO1.0", "", "GET", isinner)
-	return defAccount
+func (a *Account) NewAccount(secretID, secretKey, region string, isinner bool) *Account {
+	return &Account{
+		SecretID:  secretID,
+		SecretKey: secretKey,
+		CmqClient: NewCmqClient(secretID, secretKey, region, isinner),
+	}
+}
+
+//GetDefaultAccount -获取默认的账户信息
+func GetDefaultAccount() *Account {
+	once.Do(func() {
+		defaultAccount = &Account{
+			SecretID:  defAccount.SecretID,
+			SecretKey: defaultAccount.SecretKey,
+			CmqClient: NewCmqClient(vars.Cmq.SecretID, vars.Cmq.SecretKey, vars.Cmq.Region, vars.Cmq.Isinner),
+		}
+	})
+	return defaultAccount
 }
 
 /*

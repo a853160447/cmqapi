@@ -170,11 +170,15 @@ type DeleteSubscribeRes struct {
 	result
 }
 
-var ()
-
 //NewClient -
 func (c *CmqClient) NewClient(region, version, http, method string, IsInner bool) (cmqclient *CmqClient) {
-	cmqclient = &CmqClient{Region: region, Version: version, HTTP: http, Method: method, IsInner: IsInner}
+	cmqclient = &CmqClient{
+		Region:  region,
+		Version: version,
+		HTTP:    http,
+		Method:  method,
+		IsInner: IsInner,
+	}
 	cmqclient.InnerAddr = "http://cmq-queue-" + region + ".api.tencentyun.com/v2/index.php"
 	cmqclient.OutAddr = "https://cmq-queue-" + region + ".api.qcloud.com/v2/index.php"
 	if IsInner {
@@ -183,6 +187,10 @@ func (c *CmqClient) NewClient(region, version, http, method string, IsInner bool
 		cmqclient.Host = cmqclient.OutAddr
 	}
 	return cmqclient
+}
+
+func (c *CmqClient)getHost(isInner bool)string{
+	return str.CaseString(isInner,c.InnerAddr,c.OutAddr)
 }
 
 //BuildReqInter -初始化参数

@@ -54,8 +54,8 @@ GetClient -获取客户端信息
 rtype:CMQClient object
 return: 返回使用CMQClient object
 */
-func GetClient() *CmqClient {
-	return defAccount.CmqClient
+func (a *Account) GetClient() *CmqClient {
+	return a.CmqClient
 }
 
 /*
@@ -68,6 +68,13 @@ GetQueue -获取Account的一个queue对象
 */
 func (a *Account) GetQueue(queuename string) *CmqQueue {
 	return new(CmqQueue).NewCmqQueue(queuename, a.CmqClient, true)
+}
+
+/*
+GetDefaultAccountQueue -获取默认Account的一个queue对象
+*/
+func GetDefaultAccountQueue(queuename string) *CmqQueue {
+	return GetDefaultAccount().GetQueue(queuename)
 }
 
 /*
@@ -110,4 +117,32 @@ GetTopic -获取Account的一个topic对象
 */
 func (a *Account) GetTopic(topicname string) *CmqTopic {
 	return &CmqTopic{TopicName: topicname}
+}
+
+/**
+*CreateQueueIfNotExist -队列不存在则默认创建一个
+@type queueName string
+@rtype CmqQueue struct
+@return：返回该Account的Queue对象
+*
+*/
+func (a *Account) CreateQueueIfNotExist(queueName string) (*CmqQueue, error) {
+
+	q := a.GetQueue(queueName)
+
+	//检测是否已有队列没有则创建队列
+	searchqueue, err := a.ListQueue(q.QueueName, 1, 0)
+	if nil != err {
+		return nil, err
+	}
+
+	//没有队列则创建一个队列
+	if searchqueue != nil && searchqueue.TotalCount == 0 {
+		//创建队列
+		// err := q.CreateByName(queueName)
+		if nil != err {
+			return nil, err
+		}
+	}
+	return q, nil
 }

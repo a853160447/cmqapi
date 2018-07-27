@@ -7,19 +7,8 @@ import (
 //CmqQueue -队列
 type CmqQueue struct {
 	QueueName string //队列名
-	Encoding  bool   //64位编码
 	CmqClient *CmqClient
-}
-
-//QueueMeta - 队列属性
-type QueueMeta struct {
-	Queuename           string
-	MaxMsgHeapNum       int64 //最大堆积消息数量
-	PollingWaitSeconds  int64 //消息接收长轮询等待时间.取值范围0-30秒
-	VisibilityTimeout   int64 //消息可见性超时
-	MaxMsgSize          int64 //消息得最大长度
-	MsgRetentionSeconds int64 //消息保留周期
-	RewindSeconds       int64 //队列是否开启消息回溯能力
+	Encoding  bool //64位编码
 }
 
 //NewCmqQueue -
@@ -47,6 +36,29 @@ func (q *CmqQueue) Create(queuemeta *QueueMeta) (err error) {
 	}
 	_, err = q.CmqClient.CreateQueue(params)
 	return
+}
+
+//===============================================QueueMeta operation===============================================
+
+/*
+QueueMeta - 队列属性
+#note: 设置属性
+MaxMsgHeapNum：最大堆积消息数量
+PollingWaitSeconds：消息接收长轮询等待时间.取值范围0-30 单位：秒
+VisibilityTimeout：消息可见性超时 单位：秒
+MaxMsgSize：消息的最大长度 单位：秒
+MsgRetentionSeconds：消息保留周期 单位：秒
+RewindSeconds：队列是否开启消息回溯能力 最大回溯时间 单位：秒
+
+*/
+type QueueMeta struct {
+	MaxMsgHeapNum       int64
+	PollingWaitSeconds  int64
+	VisibilityTimeout   int64
+	MaxMsgSize          int64
+	MsgRetentionSeconds int64
+	RewindSeconds       int64
+	Queuename           string
 }
 
 //===============================================message operation===============================================

@@ -61,6 +61,34 @@ type RewindQueueRes struct {
 	result
 }
 
+//SetQueueAttributesRes -设置队列属性
+type SetQueueAttributesRes struct {
+	result
+	MaxMsgHeapNum       int64 `json:"maxMsgHeapNum"`
+	PollingWaitSeconds  int64 `json:"pollingWaitSeconds"`
+	VisibilityTimeout   int64 `json:"visibilityTimeout"`
+	MaxMsgSize          int64 `json:"maxMsgSize"`
+	MsgRetentionSeconds int64 `json:"msgRetentionSeconds"`
+	RewindSeconds       int64 `json:"rewindSeconds"`
+}
+
+//GetQueueAttributesRes - 获取队列属性
+type GetQueueAttributesRes struct {
+	result
+	MaxMsgHeapNum       int64 `json:"maxMsgHeapNum"`
+	PollingWaitSeconds  int64 `json:"pollingWaitSeconds"`
+	VisibilityTimeout   int64 `json:"visibilityTimeout"`
+	MaxMsgSize          int64 `json:"maxMsgSize"`
+	MsgRetentionSeconds int64 `json:"msgRetentionSeconds"`
+	CreateTime          int64 `json:"createTime"`
+	LastModifyTime      int64 `json:"lastModifyTime"`
+	ActiveMsgNum        int64 `json:"activeMsgNum"`
+	InactiveMsgNum      int64 `json:"inactiveMsgNum"`
+	RewindSeconds       int64 `json:"rewindSeconds"`
+	RewindmsgNum        int64 `json:"rewindmsgNum"`
+	MinMsgTime          int64 `json:"minMsgTime"`
+}
+
 //SendMessageRes -发送消息
 type SendMessageRes struct {
 	result
@@ -324,6 +352,74 @@ func (c *CmqClient) RewindQueue(params map[string]string) (rewindqueueres *Rewin
 	values := GetURLValus(cparams)
 	rewindqueueres = &RewindQueueRes{}
 	err = getURL(c.Host, values, rewindqueueres)
+	return
+}
+
+/*
+"queueName":"QUEUENAME",
+"maxMsgHeapNum":"maxMsgHeapNum",
+"pollingWaitSeconds":"pollingWaitSeconds",
+"visibilityTimeout":"visibilityTimeout",
+"maxMsgSize":"maxMsgSize",
+"msgRetentionSeconds":"msgRetentionSeconds",
+"rewindSeconds	":"rewindSeconds",
+}
+{
+"code":"CODE",
+"message":"MESSAGE"
+"requestId":"REQUESTID",
+"maxMsgHeapNum":"maxMsgHeapNum",
+"pollingWaitSeconds":"pollingWaitSeconds"
+"visibilityTimeout":"visibilityTimeout",
+"maxMsgSize":"maxMsgSize",
+"msgRetentionSeconds":"msgRetentionSeconds"
+"rewindSeconds	":"rewindSeconds	",
+}
+*SetQueueAttributes - 设置属性
+*/
+func (c *CmqClient) SetQueueAttributes(params map[string]string) (setQueueAttributesRes *SetQueueAttributesRes, err error) {
+	defer profile.TimeTrack(time.Now(), "[Wx-API] SetQueueAttributes")
+
+	//拼接参数
+	cparams, _ := c.BuildReqInter("SetQueueAttributes", params)
+	//转换请求
+	values := GetURLValus(cparams)
+	setQueueAttributesRes = &SetQueueAttributesRes{}
+	err = getURL(c.Host, values, setQueueAttributesRes)
+	return
+}
+
+/*
+"queueName":"QUEUENAME",
+}
+{
+"code":"CODE",
+"message":"MESSAGE"
+"requestId":"REQUESTID",
+"maxMsgHeapNum":"maxMsgHeapNum",
+"pollingWaitSeconds":"pollingWaitSeconds"
+"visibilityTimeout":"visibilityTimeout",
+"maxMsgSize":"maxMsgSize",
+"msgRetentionSeconds":"msgRetentionSeconds"
+"createTime":"createTime"
+"lastModifyTime":"lastModifyTime"
+"activeMsgNum":"activeMsgNum"
+"inactiveMsgNum":"inactiveMsgNum"
+"rewindSeconds":"rewindSeconds"
+"rewindmsgNum":"rewindmsgNum"
+"minMsgTime	":"minMsgTime"
+}
+*GetQueueAttributes -获取队列属性
+*/
+func (c *CmqClient) GetQueueAttributes(params map[string]string) (getQueueAttributesRes *GetQueueAttributesRes, err error) {
+	defer profile.TimeTrack(time.Now(), "[Wx-API] GetQueueAttributes")
+
+	//拼接参数
+	cparams, _ := c.BuildReqInter("GetQueueAttributes", params)
+	//转换请求
+	values := GetURLValus(cparams)
+	getQueueAttributesRes = &GetQueueAttributesRes{}
+	err = getURL(c.Host, values, getQueueAttributesRes)
 	return
 }
 

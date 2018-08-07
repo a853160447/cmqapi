@@ -67,7 +67,7 @@ GetQueue -获取Account的一个queue对象
 @return:返回Account的一个Queue对象
 */
 func (a *Account) GetQueue(queuename string) *CmqQueue {
-	return new(CmqQueue).NewCmqQueue(queuename, a.CmqClient, true)
+	return NewCmqQueue(queuename, a.CmqClient, true)
 }
 
 /*

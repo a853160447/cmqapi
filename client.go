@@ -189,7 +189,7 @@ type GetTopicAttributesRes struct {
 	MsgRetentionSeconds int64 `json:"msgRetentionSeconds"`
 	CreateTime          int64 `json:"createTime"`
 	LastModifyTime      int64 `json:"lastModifyTime"`
-	FilterType          int64 `json:"filterType"`
+	FilterType          int32 `json:"filterType"`
 }
 
 //PublishMessageRes -用于发布一条消息到指定的主题

@@ -159,9 +159,37 @@ type CreateTopicRes struct {
 	TopicID string `json:"topicId"`
 }
 
+//TopicList -
+type TopicList struct {
+	TopicID   string `json:"topicId"`
+	TopicName string `json:"topicName"`
+}
+
+//ListTopicRes - 获取主题列表
+type ListTopicRes struct {
+	result
+	TopicList []TopicList
+}
+
 //DeleteTopicRes -删除主题
 type DeleteTopicRes struct {
 	result
+}
+
+//SetTopicAttributesRes - 设置主题属性
+type SetTopicAttributesRes struct {
+	result
+}
+
+//GetTopicAttributesRes -获取主题属性
+type GetTopicAttributesRes struct {
+	result
+	MsgCount            int64 `json:"msgCount"`
+	MaxMsgSize          int64 `json:"maxMsgSize"`
+	MsgRetentionSeconds int64 `json:"msgRetentionSeconds"`
+	CreateTime          int64 `json:"createTime"`
+	LastModifyTime      int64 `json:"lastModifyTime"`
+	FilterType          int64 `json:"filterType"`
 }
 
 //PublishMessageRes -用于发布一条消息到指定的主题
@@ -181,8 +209,8 @@ type CreateSubscribeRes struct {
 	result
 }
 
-//TopicList -
-type TopicList struct {
+//SubScriptionList -订阅列
+type SubScriptionList struct {
 	SubscriptionID   string `json:"subscriptionId"`
 	SubscriptionName string `json:"subscriptionName"`
 	Protocol         string `json:"protocol"`
@@ -192,8 +220,24 @@ type TopicList struct {
 //ListSubscribeRes -获取订阅列表
 type ListSubscribeRes struct {
 	result
-	TotalCount int64       `json:"totalCount"`
-	TopicList  []TopicList `json:"subscriptionList"`
+	TotalCount       int64              `json:"totalCount"`
+	SubScriptionList []SubScriptionList `json:"subscriptionList"`
+}
+
+//SetSubScriptionAttributesRes -修改订阅属性
+type SetSubScriptionAttributesRes struct {
+	result
+}
+
+//GetSubScriptionAttributesRes - 获取订阅属性
+type GetSubScriptionAttributesRes struct {
+	result
+	SubScriptionList []SubScriptionList
+}
+
+//ClearFilterTagsRes -
+type ClearFilterTagsRes struct {
+	result
 }
 
 //DeleteSubscribeRes -删除订阅
@@ -579,7 +623,7 @@ func (c *CmqClient) BatchDeleteMessage(params map[string]string) (batchdeletemes
 
 //===============================================topic operation===============================================
 
-/**
+/*
 {
 "topicName":"TOPICNAME",
 "maxMsgSize":"MAXMSGSIZE"
@@ -592,8 +636,8 @@ func (c *CmqClient) BatchDeleteMessage(params map[string]string) (batchdeletemes
 "requestId":"REQUESTID",
 "topicId":"TOPICID"
 }
-**/
-//CreateTopic -创建主题
+CreateTopic -创建主题
+*/
 func (c *CmqClient) CreateTopic(params map[string]string) (createtopicres *CreateTopicRes, err error) {
 	defer profile.TimeTrack(time.Now(), "[Wx-API] CreateTopic")
 	//拼接参数
@@ -605,11 +649,57 @@ func (c *CmqClient) CreateTopic(params map[string]string) (createtopicres *Creat
 	return
 }
 
-//修改主题属性
+/*
+{
+"topicName":"TOPICNAME",
+"maxMsgSize":"MAXMSGSIZE"
 
-//获取主题列表
+}
+{
+"code":"CODE",
+"message":"MESSAGE"
+"requestId":"REQUESTID",
+}
+SetTopicAttributes - 设置主题属性
+*/
+func (c *CmqClient) SetTopicAttributes(params map[string]string) (settopicattributesres *SetTopicAttributesRes, err error) {
+	defer profile.TimeTrack(time.Now(), "[Wx-API] SetTopicAttributes")
+	//拼接参数
+	cparams, _ := c.BuildReqInter("SetTopicAttributes", params)
+	//转换请求
+	values := GetURLValus(cparams)
+	settopicattributesres = &SetTopicAttributesRes{}
+	err = getURL(c.Host, values, settopicattributesres)
+	return
+}
 
-//获取主题属性
+/*
+{
+"topicName":"TOPICNAME",
+}
+{
+"code":"CODE",
+"message":"MESSAGE"
+"requestId":"REQUESTID",
+"msgCount":"MSGCOUNT",
+"maxMsgSize":"MAXMSGSIZE"
+"msgRetentionSeconds":"MSGRETENTIONSECONDS",
+"createTime":"CREATETIME",
+"lastModifyTime":"LASTMODIFYTIME"
+"filterType":"FILTERTYPE",
+}
+GetTopicAttributes - 获取主题属性
+*/
+func (c *CmqClient) GetTopicAttributes(params map[string]string) (getTopicAttributesRes *GetTopicAttributesRes, err error) {
+	defer profile.TimeTrack(time.Now(), "[Wx-API] GetTopicAttributes")
+	//拼接参数
+	cparams, _ := c.BuildReqInter("GetTopicAttributes", params)
+	//转换请求
+	values := GetURLValus(cparams)
+	getTopicAttributesRes = &GetTopicAttributesRes{}
+	err = getURL(c.Host, values, getTopicAttributesRes)
+	return
+}
 
 /**
 {
@@ -685,7 +775,7 @@ func (c *CmqClient) BatchPublishMessage(params map[string]string) (batchpublishm
 
 //============================================subscription operation=============================================
 
-/**
+/*
 {
 "topicName":"TOPICNAME",
 "subscriptionName":"SUBSCRIPTIONNAME",
@@ -715,6 +805,30 @@ func (c *CmqClient) CreateSubscription(params map[string]string) (createsubscrib
 	return
 }
 
+/*
+{
+"topicName":"TOPICNAME",
+"subscriptionName":"SUBSCRIPTIONNAME",
+}
+{
+"code":"CODE",
+"message":"MESSAGE"
+"requestId":"REQUESTID",
+}
+CreateSubscription -清空订阅标签
+*/
+func (c *CmqClient) ClearFilterTags(params map[string]string) (clearFilterTagsRes *ClearFilterTagsRes, err error) {
+	defer profile.TimeTrack(time.Now(), "[Wx-API] ClearSubscriptionFilterTags")
+
+	//拼接参数
+	cparams, _ := c.BuildReqInter("ClearSubscriptionFilterTags", params)
+	//转换请求
+	values := GetURLValus(cparams)
+	clearFilterTagsRes = &ClearFilterTagsRes{}
+	err = getURL(c.Host, values, clearFilterTagsRes)
+	return
+}
+
 /**
 {
 "topicName":"TOPICNAME",
@@ -740,6 +854,62 @@ func (c *CmqClient) ListSubscription(params map[string]string) (listsubscriberes
 	values := GetURLValus(cparams)
 	listsubscriberes = &ListSubscribeRes{}
 	err = getURL(c.Host, values, listsubscriberes)
+	return
+}
+
+/*
+{
+"topicName":"TOPICNAME",
+"searchWord":"SUBSCRIPTIONNAME",
+"offset":"PROTOCOL",
+"limit":"ENDPOINT",
+}
+{
+"code":"CODE",
+"message":"MESSAGE"
+"requestId":"REQUESTID",
+"totalCount":"TOTALCOUNT",
+"subscriptionList":"SUBSCRIPTIONLIST",
+}
+*/
+//SetSubScriptionAttributes -修改订阅属性
+func (c *CmqClient) SetSubScriptionAttributes(params map[string]string) (setSubScriptionAttributesRes *SetSubScriptionAttributesRes, err error) {
+	defer profile.TimeTrack(time.Now(), "[Wx-API] SetSubscriptionAttributes")
+
+	//拼接参数
+	cparams, _ := c.BuildReqInter("SetSubscriptionAttributes", params)
+	//转换请求
+	values := GetURLValus(cparams)
+	setSubScriptionAttributesRes = &SetSubScriptionAttributesRes{}
+	err = getURL(c.Host, values, setSubScriptionAttributesRes)
+	return
+}
+
+/*
+{
+"topicName":"TOPICNAME",
+"searchWord":"SUBSCRIPTIONNAME",
+"offset":"PROTOCOL",
+"limit":"ENDPOINT",
+}
+{
+"code":"CODE",
+"message":"MESSAGE"
+"requestId":"REQUESTID",
+"totalCount":"TOTALCOUNT",
+"subscriptionList":"SUBSCRIPTIONLIST",
+}
+*/
+//GetSubScriptionAttributes -获取订阅属性
+func (c *CmqClient) GetSubScriptionAttributes(params map[string]string) (getSubScriptionAttributesRes *GetSubScriptionAttributesRes, err error) {
+	defer profile.TimeTrack(time.Now(), "[Wx-API] GetSubscriptionAttributes")
+
+	//拼接参数
+	cparams, _ := c.BuildReqInter("GetSubscriptionAttributes", params)
+	//转换请求
+	values := GetURLValus(cparams)
+	getSubScriptionAttributesRes = &GetSubScriptionAttributesRes{}
+	err = getURL(c.Host, values, getSubScriptionAttributesRes)
 	return
 }
 
